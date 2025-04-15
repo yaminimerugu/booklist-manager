@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book Manager</title>
+</head>
+<body>
+  <h2>Add a Book</h2>
+  <form id="bookForm">
+    <input type="text" id="title" placeholder="Title" required /><br/>
+    <input type="text" id="author" placeholder="Author" required /><br/>
+    <input type="number" id="year" placeholder="Year" required /><br/>
+    <button type="submit">Add Book</button>
+  </form>
+
+  <h3>Book List</h3>
+  <ul id="bookList"></ul>
+
+  <script>
+    // Fetch books
+    async function loadBooks() {
+      const res = await fetch('http://localhost:5000/books');
+      const books = await res.json();
+      const list = document.getElementById('bookList');
+      list.innerHTML = '';
+
+      books.forEach(book => {
+        const li = document.createElement('li');
+        li.textContent = `${book.title} by ${book.author} (${book.year})`;
+        const btn = document.createElement('button');
+        btn.textContent = 'Delete';
+        btn.onclick = async () => {
+          await fetch(`http://localhost:5000/books/${book._id}`, { method: 'DELETE' });
+          loadBooks(); // Refresh list
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+
+    // Handle form submit
+    document.getElementById('bookForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const year = document.getElementById('year').value;
+
+      await fetch('http://localhost:5000/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, author, year })
+      });
+
+      document.getElementById('bookForm').reset();
+      loadBooks();
+    });
+
+    // Load books initially
+    loadBooks();
+  </script>
+</body>
+</html>
