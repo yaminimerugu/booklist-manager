@@ -55,37 +55,44 @@ jobs:
           path: backend/coverage/
 
   deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+  needs: build-and-test
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/main'
 
-    steps:
-      - name: 🚀 Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            echo "📂 Navigating to the app directory..."
-            cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
+  steps:
+    - name: 🚀 Decode private key for SSH
+      run: echo "${{ secrets.EC2_KEY }}" | base64 --decode > ~/.ssh/my-keypair.pem
 
-            echo "🔄 Pulling latest changes..."
-            git pull origin main || { echo "❌ Git pull failed"; exit 1; }
+    - name: Set permissions on private key
+      run: chmod 600 ~/.ssh/my-keypair.pem
 
-            echo "📦 Installing dependencies..."
-            npm install || { echo "❌ npm install failed"; exit 1; }
+    - name: 🚀 Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          echo "📂 Navigating to the app directory..."
+          cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
 
-            echo "♻️ Restarting or starting the app..."
-            pm2 restart all || pm2 start server.js --name booklist-api
+          echo "🔄 Pulling latest changes..."
+          git pull origin main || { echo "❌ Git pull failed"; exit 1; }
 
-            echo "📋 Checking logs..."
-            tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "⚠️ No logs found."
+          echo "📦 Installing dependencies..."
+          npm install || { echo "❌ npm install failed"; exit 1; }
 
-            echo "🩺 Running health check..."
-            curl --fail http://localhost:5000/health || { echo "❌ Health check failed"; exit 1; }
+          echo "♻️ Restarting or starting the app..."
+          pm2 restart all || pm2 start server.js --name booklist-api
 
-            echo "✅ Application deployed and healthy!"
+          echo "📋 Checking logs..."
+          tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "⚠️ No logs found."
+
+          echo "🩺 Running health check..."
+          curl --fail http://localhost:5000/health || { echo "❌ Health check failed"; exit 1; }
+
+          echo "✅ Application deployed and healthy!"
+
 
   logging:
     needs: deploy
