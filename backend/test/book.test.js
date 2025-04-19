@@ -1,20 +1,24 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
-const { app, startServer } = require('../server');
+const { app } = require('../server'); // only import app
 const Book = require('../models/Book');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-jest.setTimeout(30000); // 30 seconds
-
+// Connect to a test database before running any tests
 beforeAll(async () => {
-  await startServer(); // Just start DB and middleware if needed
+  await mongoose.connect('mongodb://localhost:27017/booklist_test', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 });
 
+// Disconnect and clean up after all tests
 afterAll(async () => {
-  await mongoose.connection.close();
+  await mongoose.connection.dropDatabase(); // optional: clear test DB
+  await mongoose.disconnect();
 });
 
 describe('Books API', () => {
