@@ -14,6 +14,20 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MONGO_URI: mongodb://localhost:27017/booklist_db
+
     steps:
       - name: 📦 Checkout code
         uses: actions/checkout@v3
@@ -25,20 +39,19 @@ jobs:
 
       - name: 📥 Install dependencies
         run: |
-          cd backend  # Ensure you're in the correct directory where package.json is located
+          cd backend
           npm install
 
       - name: ✅ Run tests
         run: |
-          cd backend  # Run tests in the backend directory
-          chmod +x ./node_modules/.bin/jest  # Ensure Jest has execute permissions
-          npx jest --coverage  # Run tests and generate coverage report
+          cd backend
+          npx jest --coverage
 
       - name: 📊 Upload coverage report
         uses: actions/upload-artifact@main
         with:
           name: coverage-report
-          path: backend/coverage/  # Adjust if your coverage directory differs
+          path: backend/coverage/
 
   deploy:
     needs: build-and-test
