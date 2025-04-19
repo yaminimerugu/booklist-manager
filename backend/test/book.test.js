@@ -1,37 +1,29 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
-const { app, startServer } = require('../server'); // ✅ Correct path
+const { app, startServer } = require('../server');
 const Book = require('../models/Book');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-let server;  // Declare server to access it in afterAll
-const port = 0; // Use 0 to let the OS assign a free port
-jest.setTimeout(30000); // 30 seconds timeout
+jest.setTimeout(30000); // 30 seconds
 
 beforeAll(async () => {
-  await startServer(); // Starts the Express server
-  server = app.listen(port, () => {
-    console.log(`Test server running on ${server.address().port}`);
-  }); // Ensure server is running on an available port
+  await startServer(); // Just start DB and middleware if needed
 });
 
 afterAll(async () => {
-  await mongoose.connection.close(); // Disconnect from MongoDB
-  await new Promise(resolve => {
-    server.close(resolve); // Ensure server is closed properly
-  });
+  await mongoose.connection.close();
 });
 
 describe('Books API', () => {
   beforeEach(async () => {
-    await Book.deleteMany({}); // Clean up before each test
+    await Book.deleteMany({});
   });
 
   afterEach(async () => {
-    await Book.deleteMany({}); // Clean up after each test
+    await Book.deleteMany({});
   });
 
   test('GET /books should return array', async () => {
