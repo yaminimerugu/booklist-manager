@@ -8,10 +8,13 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 let server;  // Declare server to access it in afterAll
+const port = 0; // Use 0 to let the OS assign a free port
 
 beforeAll(async () => {
   await startServer(); // Starts the Express server
-  server = app.listen(5000); // Ensure server is running
+  server = app.listen(port, () => {
+    console.log(`Test server running on ${server.address().port}`);
+  }); // Ensure server is running on an available port
 });
 
 afterAll(async () => {
