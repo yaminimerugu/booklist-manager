@@ -59,34 +59,33 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
-  steps:
-    - name: 🚀 Deploy to EC2 via SSH
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.EC2_HOST }}   # Check if this is correctly referencing the EC2 Host secret
-        username: ec2-user
-        key: ${{ secrets.EC2_KEY }}     # Ensure EC2_KEY is correctly set
-        script: |
-          echo "📂 Navigating to the app directory..."
-          cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
+    steps:
+      - name: 🚀 Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}   # Check if this is correctly referencing the EC2 Host secret
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}     # Ensure EC2_KEY is correctly set
+          script: |
+            echo "📂 Navigating to the app directory..."
+            cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
 
-          echo "🔄 Pulling latest changes..."
-          git pull origin main || { echo "❌ Git pull failed"; exit 1; }
+            echo "🔄 Pulling latest changes..."
+            git pull origin main || { echo "❌ Git pull failed"; exit 1; }
 
-          echo "📦 Installing dependencies..."
-          npm install || { echo "❌ npm install failed"; exit 1; }
+            echo "📦 Installing dependencies..."
+            npm install || { echo "❌ npm install failed"; exit 1; }
 
-          echo "♻️ Restarting or starting the app..."
-          pm2 restart all || pm2 start server.js --name booklist-api
+            echo "♻️ Restarting or starting the app..."
+            pm2 restart all || pm2 start server.js --name booklist-api
 
-          echo "📋 Checking logs..."
-          tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "⚠️ No logs found."
+            echo "📋 Checking logs..."
+            tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "⚠️ No logs found."
 
-          echo "🩺 Running health check..."
-          curl --fail http://localhost:5000/health || { echo "❌ Health check failed"; exit 1; }
+            echo "🩺 Running health check..."
+            curl --fail http://localhost:5000/health || { echo "❌ Health check failed"; exit 1; }
 
-          echo "✅ Application deployed and healthy!"
-
+            echo "✅ Application deployed and healthy!"
 
   logging:
     needs: deploy
