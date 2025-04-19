@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest test"
+    "test": "npx jest"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,9 @@
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/test"
+    ],
+    "testMatch": [
+      "**/?(*.)+(spec|test).[tj]s?(x)"
     ]
   }
 }
