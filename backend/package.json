@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "test": "NODE_ENV=test jest --detectOpenHandles --forceExit"
-}
+    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit"
   },
   "author": "",
   "license": "ISC",
@@ -26,7 +25,7 @@
       "<rootDir>/test"
     ],
     "testMatch": [
-  "**/?(*.)+(spec|test).[tj]s?(x)"
+      "**/?(*.)+(spec|test).[tj]s?(x)"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/"
