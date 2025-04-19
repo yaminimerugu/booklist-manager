@@ -1,30 +1,26 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const bookRoutes = require('./routes/bookRoutes');
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+dotenv.config();
 
-// Middleware
+const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/books', bookRoutes);
+app.use('/api/books', bookRoutes);
 
-// MongoDB Connection
-mongoose
-  .connect('mongodb://localhost:27017/booklist', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error(err));
-
-// Only start the server if NOT in test mode
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/booklist', {
+    // no need for useNewUrlParser or useUnifiedTopology anymore
+  })
+  .then(() => {
+    console.log('MongoDB connected');
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+  })
+  .catch(err => console.error(err));
 }
 
-module.exports = { app }; // Export app for testing
+module.exports = app; // Export app for testing
