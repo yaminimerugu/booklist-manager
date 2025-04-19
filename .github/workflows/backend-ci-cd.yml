@@ -28,11 +28,6 @@ jobs:
           cd backend  # Ensure you're in the correct directory where package.json is located
           npm install
 
-      - name: 📋 Check Jest permissions (if required)
-        run: |
-          cd backend
-          ls -l ./node_modules/.bin/jest  # Check permissions of Jest binary
-
       - name: ✅ Run tests
         run: |
           cd backend  # Run tests in the backend directory
