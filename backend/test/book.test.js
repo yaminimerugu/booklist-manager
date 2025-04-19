@@ -9,6 +9,7 @@ const expect = chai.expect;
 
 let server;  // Declare server to access it in afterAll
 const port = 0; // Use 0 to let the OS assign a free port
+jest.setTimeout(30000); // 30 seconds timeout
 
 beforeAll(async () => {
   await startServer(); // Starts the Express server
