@@ -49,7 +49,7 @@ jobs:
           npx jest --coverage
 
       - name: 📊 Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: coverage-report
           path: backend/coverage/
@@ -61,9 +61,9 @@ jobs:
 
     steps:
       - name: 🚀 Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v0.1.0   # Updated to the latest version
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}   # Ensure this is correctly referencing the EC2 Host secret
+          host: ${{ secrets.EC2_HOST }}   # Check if this is correctly referencing the EC2 Host secret
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}     # Ensure EC2_KEY is correctly set
           script: |
@@ -76,13 +76,8 @@ jobs:
             echo "📦 Installing dependencies..."
             npm install || { echo "❌ npm install failed"; exit 1; }
 
-            echo "📦 Checking if pm2 is installed..."
-            if ! command -v pm2 &> /dev/null; then
-              echo "❌ PM2 not found. Installing pm2..."
-              npm install pm2@latest -g || { echo "❌ pm2 installation failed"; exit 1; }
-            else
-              echo "✅ PM2 is already installed."
-            fi
+            echo "📦 Installing pm2..."
+            npm install pm2@latest -g || { echo "❌ pm2 installation failed"; exit 1; }
 
             echo "♻️ Restarting or starting the app..."
             pm2 restart all || pm2 start server.js --name booklist-api
