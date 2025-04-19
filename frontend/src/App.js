@@ -10,7 +10,7 @@ function App() {
   // Fetch books from the API
   const fetchBooks = async () => {
     try {
-      const res = await axios.get('http://52.91.45.31:5000/books');
+      const res = await axios.get('http://52.91.45.31:5000/api/books');
       console.log(res.data); // Log the response to check the data structure
       setBooks(res.data);
     } catch (error) {
@@ -27,7 +27,7 @@ function App() {
     }
 
     try {
-      await axios.post('http://52.91.45.31:5000/books', book);
+      await axios.post('http://52.91.45.31:5000/api/books', book);
       fetchBooks(); // Fetch updated list after adding the book
       setSuccessMessage('Book added successfully!');
       setBook({ title: '', author: '', year: '' }); // Reset input fields after adding a book
@@ -40,7 +40,7 @@ function App() {
   // Delete a book by its ID
   const deleteBook = async (id) => {
     try {
-      await axios.delete(`http://52.91.45.31:5000/books/${id}`);
+      await axios.delete(`http://52.91.45.31:5000/api/books/${id}`);
       fetchBooks(); // Fetch updated list after deleting the book
       setSuccessMessage('Book deleted successfully!');
     } catch (error) {

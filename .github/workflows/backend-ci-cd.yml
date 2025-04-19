@@ -32,7 +32,7 @@ jobs:
         run: |
           cd backend  # Run tests in the backend directory
           chmod +x ./node_modules/.bin/jest  # Ensure Jest has execute permissions
-          npx jest ./tests  # Adjust path if your tests are in a different folder
+          npx jest --coverage  # Run tests and generate coverage report
 
       - name: 📊 Upload coverage report
         uses: actions/upload-artifact@main
@@ -54,7 +54,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             echo "📂 Navigating to the app directory..."
-            cd backend || { echo "❌ Directory not found"; exit 1; }
+            cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
 
             echo "🔄 Pulling latest changes..."
             git pull origin main || { echo "❌ Git pull failed"; exit 1; }
