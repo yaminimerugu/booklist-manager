@@ -76,6 +76,9 @@ jobs:
             echo "📦 Installing dependencies..."
             npm install || { echo "❌ npm install failed"; exit 1; }
 
+            echo "📦 Installing pm2..."
+            npm install pm2@latest -g || { echo "❌ pm2 installation failed"; exit 1; }
+
             echo "♻️ Restarting or starting the app..."
             pm2 restart all || pm2 start server.js --name booklist-api
 
