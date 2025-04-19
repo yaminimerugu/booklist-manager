@@ -30,7 +30,7 @@ jobs:
         run: npm test
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: coverage-report
           path: coverage/
@@ -49,24 +49,29 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             # Navigate to the application directory
-            cd booklist-manager
+            echo "Navigating to the app directory..."
+            cd booklist-manager || { echo "Directory not found"; exit 1; }
 
             # Pull the latest changes from the main branch
-            git pull origin main
+            echo "Pulling the latest changes from main..."
+            git pull origin main || { echo "Git pull failed"; exit 1; }
 
             # Install dependencies
-            npm install
+            echo "Installing dependencies..."
+            npm install || { echo "npm install failed"; exit 1; }
 
             # Restart the application if already running or start it
+            echo "Restarting or starting the application..."
             pm2 restart all || pm2 start server.js --name booklist-api
 
             # Monitor application logs
             echo "Monitoring application logs..."
-            tail -n 100 /var/log/syslog # Replace with actual log file path if needed
+            tail -n 100 /var/log/syslog || tail -n 100 /var/log/messages # Update based on actual log location
 
-            # Check if the server is up and responding
+            # Run a health check to ensure the app is up
             echo "Running health check..."
-            curl --silent --show-error http://localhost:5000/health || exit 1
+            curl --silent --show-error http://localhost:5000/health || { echo "Health check failed"; exit 1; }
+
             echo "Application deployed and healthy!"
 
   logging:
@@ -80,11 +85,11 @@ jobs:
       - name: Generate and analyze logs
         run: |
           echo "Starting application logs..."
-          # Simulate log generation
           echo "$(date) - Deployment successful" >> app.log
           tail -n 10 app.log # Display the last 10 lines of the log for analysis
 
       - name: Push logs to a remote log management service (optional)
         run: |
-          curl -X POST -d @app.log https://log-management-service.com/api/logs
+          echo "Pushing logs to remote service..."
+          curl -X POST -d @app.log https://log-management-service.com/api/logs || { echo "Failed to push logs"; exit 1; }
           echo "Logs pushed to remote service" # Replace with actual service API
