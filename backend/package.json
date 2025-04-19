@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest ../test"  // Use npx to ensure Jest runs correctly
+    "test": "npx jest ../test"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +23,7 @@
   "jest": {
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/test"  // Ensure Jest knows where to look for tests
+      "<rootDir>/test"
     ]
   }
 }
