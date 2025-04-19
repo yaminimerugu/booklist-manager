@@ -45,6 +45,7 @@ jobs:
       - name: ✅ Run tests
         run: |
           cd backend
+          chmod +x ./node_modules/.bin/jest || true
           npx jest --coverage
 
       - name: 📊 Upload coverage report
