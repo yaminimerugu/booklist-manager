@@ -14,20 +14,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:5.0
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      MONGO_URI: mongodb://localhost:27017/booklist_db
-
     steps:
       - name: 📦 Checkout code
         uses: actions/checkout@v3
@@ -48,7 +34,7 @@ jobs:
           npx jest --coverage
 
       - name: 📊 Upload coverage report
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: backend/coverage/
