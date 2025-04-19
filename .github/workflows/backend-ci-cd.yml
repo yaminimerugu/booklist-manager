@@ -31,7 +31,7 @@ jobs:
       - name: ✅ Run tests
         run: |
           cd backend  # Run tests in the backend directory
-          npm test
+          npm test    # Ensure your test script is configured correctly
 
       - name: 📊 Upload coverage report
         uses: actions/upload-artifact@main
