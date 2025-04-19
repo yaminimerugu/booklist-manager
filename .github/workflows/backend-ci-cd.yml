@@ -28,10 +28,16 @@ jobs:
           cd backend  # Ensure you're in the correct directory where package.json is located
           npm install
 
+      - name: 📋 Check Jest permissions (if required)
+        run: |
+          cd backend
+          ls -l ./node_modules/.bin/jest  # Check permissions of Jest binary
+
       - name: ✅ Run tests
         run: |
           cd backend  # Run tests in the backend directory
-          npm test    # Ensure your test script is configured correctly
+          chmod +x ./node_modules/.bin/jest  # Ensure Jest has execute permissions
+          npx jest ../test  # Run Jest tests using npx
 
       - name: 📊 Upload coverage report
         uses: actions/upload-artifact@main
