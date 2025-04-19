@@ -37,7 +37,7 @@ jobs:
         run: |
           cd backend  # Run tests in the backend directory
           chmod +x ./node_modules/.bin/jest  # Ensure Jest has execute permissions
-          npx jest ../test  # Run Jest tests using npx
+          npx jest ./tests  # Adjust path if your tests are in a different folder
 
       - name: 📊 Upload coverage report
         uses: actions/upload-artifact@main
