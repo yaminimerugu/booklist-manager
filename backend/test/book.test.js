@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const { app, startServer } = require('../server'); // ✅ Correct path
-const Book = require('../models/book');
+const Book = require('../models/Book');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
