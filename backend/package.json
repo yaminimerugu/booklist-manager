@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest test"  // Update this to point to the correct test directory
+    "test": "npx jest test"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +23,7 @@
   "jest": {
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/test"  // Ensure this points to the correct directory where your test files are located
+      "<rootDir>/test"
     ]
   }
 }
