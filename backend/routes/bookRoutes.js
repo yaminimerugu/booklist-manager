@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Book = require('../models/book');
+const Book = require('../models/Book');
 
 // Add a new book
 router.post('/', async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedBook = await Book.findByIdAndDelete(id); // Find and delete the book by ID
+    const deletedBook = await Book.findByIdAndDelete(id);
 
     if (!deletedBook) {
       return res.status(404).json({ message: 'Book not found' });
@@ -37,6 +37,26 @@ router.delete('/:id', async (req, res) => {
     res.status(200).json({ message: 'Book deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting book', error: error.message });
+  }
+});
+
+// ✅ Update a book by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedBook = await Book.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBook) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    res.status(200).json(updatedBook);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating book', error: error.message });
   }
 });
 
