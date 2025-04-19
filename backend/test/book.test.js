@@ -12,7 +12,10 @@ let server; // Variable to hold the server instance
 // Connect to the MongoDB before tests
 beforeAll(async () => {
   await startServer(); // Starts the Express server
-  server = app.listen(5000); // Ensure server is running
+  server = app.listen(0, () => { // Using 0 will bind the server to any available port
+    const address = server.address();
+    console.log(`Server running on http://localhost:${address.port}`);
+  });
 });
 
 // Disconnect from MongoDB and close server after all tests
