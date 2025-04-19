@@ -1,0 +1,90 @@
+name: CI/CD for Booklist Manager
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            # Navigate to the application directory
+            cd booklist-manager
+
+            # Pull the latest changes from the main branch
+            git pull origin main
+
+            # Install dependencies
+            npm install
+
+            # Restart the application if already running or start it
+            pm2 restart all || pm2 start server.js --name booklist-api
+
+            # Monitor application logs
+            echo "Monitoring application logs..."
+            tail -n 100 /var/log/syslog # Replace with actual log file path if needed
+
+            # Check if the server is up and responding
+            echo "Running health check..."
+            curl --silent --show-error http://localhost:5000/health || exit 1
+            echo "Application deployed and healthy!"
+
+  logging:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install logging utilities
+        run: sudo apt-get install -y jq
+
+      - name: Generate and analyze logs
+        run: |
+          echo "Starting application logs..."
+          # Simulate log generation
+          echo "$(date) - Deployment successful" >> app.log
+          tail -n 10 app.log # Display the last 10 lines of the log for analysis
+
+      - name: Push logs to a remote log management service (optional)
+        run: |
+          curl -X POST -d @app.log https://log-management-service.com/api/logs
+          echo "Logs pushed to remote service" # Replace with actual service API
