@@ -15,25 +15,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔧 Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: 📥 Install dependencies
-        run: npm install
+      - name: Install dependencies
+        run: |
+          cd backend  # Navigate to the 'backend' directory where package.json is located
+          npm install
 
-      - name: ✅ Run tests
-        run: npm test
+      - name: Run tests
+        run: |
+          cd backend  # Ensure tests are run in the 'backend' directory
+          npm test
 
-      - name: 📊 Upload coverage report
-        uses: actions/upload-artifact@main
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
-          path: coverage/
+          path: backend/coverage/  # Adjust path if coverage report is in another location
 
   deploy:
     needs: build-and-test
@@ -41,30 +45,30 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: 🚀 Deploy to EC2 via SSH
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "📂 Navigating to the app directory..."
-            cd booklist-manager || { echo "❌ Directory not found"; exit 1; }
+            echo "Navigating to the app directory..."
+            cd backend || { echo "Directory not found"; exit 1; }
 
-            echo "🔄 Pulling latest changes..."
-            git pull origin main || { echo "❌ Git pull failed"; exit 1; }
+            echo "Pulling latest changes..."
+            git pull origin main || { echo "Git pull failed"; exit 1; }
 
-            echo "📦 Installing dependencies..."
-            npm ci || { echo "❌ npm install failed"; exit 1; }
+            echo "Installing dependencies..."
+            npm install || { echo "npm install failed"; exit 1; }
 
-            echo "♻️ Restarting or starting the app..."
+            echo "Restarting or starting the app..."
             pm2 restart all || pm2 start server.js --name booklist-api
 
-            echo "📋 Checking logs..."
-            tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "⚠️ No logs found."
+            echo "Checking logs..."
+            tail -n 100 /var/log/syslog 2>/dev/null || tail -n 100 /var/log/messages 2>/dev/null || echo "No logs found."
 
-            echo "🩺 Running health check..."
-            curl --fail http://localhost:5000/health || { echo "❌ Health check failed"; exit 1; }
+            echo "Running health check..."
+            curl --fail http://localhost:5000/health || { echo "Health check failed"; exit 1; }
 
             echo "✅ Application deployed and healthy!"
 
@@ -73,16 +77,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛠️ Install logging utilities
+      - name: Install logging utilities
         run: sudo apt-get install -y jq
 
-      - name: 🧾 Generate and analyze logs
+      - name: Generate and analyze logs
         run: |
-          echo "📝 Generating logs..."
+          echo "Generating logs..."
           echo "$(date) - Deployment successful" >> app.log
           tail -n 10 app.log
 
-      - name: ☁️ Push logs to remote service (optional)
+      - name: Push logs to remote service (optional)
         run: |
-          echo "📤 Pushing logs..."
+          echo "Pushing logs..."
           curl -X POST -H "Content-Type: text/plain" --data-binary @app.log https://log-management-service.com/api/logs || echo "⚠️ Log push failed (optional)"
