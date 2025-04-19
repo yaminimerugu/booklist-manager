@@ -34,7 +34,7 @@ jobs:
           npm test
 
       - name: 📊 Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: coverage-report
           path: backend/coverage/  # Adjust if your coverage directory differs
