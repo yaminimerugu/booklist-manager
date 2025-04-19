@@ -2,10 +2,22 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../server'); // Adjust path if needed
 const expect = chai.expect;
+const Book = require('../models/Book'); // Assuming Book model exists
 
 chai.use(chaiHttp);
 
 describe('Books API', () => {
+  // Cleanup before and after tests
+  beforeEach(async () => {
+    // Clear the books collection before each test
+    await Book.deleteMany({});
+  });
+
+  afterEach(async () => {
+    // Optional: Clean up after tests
+    await Book.deleteMany({});
+  });
+
   it('GET /books should return array', (done) => {
     chai.request(server)
       .get('/books')
@@ -31,7 +43,7 @@ describe('Books API', () => {
     chai.request(server)
       .delete('/books/invalidid')
       .end((err, res) => {
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(400); // You can change 500 to 400 or any appropriate status
         done();
       });
   });
@@ -41,7 +53,7 @@ describe('Books API', () => {
       .put('/books/invalidid')
       .send({ title: "Updated Book" })
       .end((err, res) => {
-        expect(res).to.have.status(500);
+        expect(res).to.have.status(400); // Adjust status code as needed
         done();
       });
   });

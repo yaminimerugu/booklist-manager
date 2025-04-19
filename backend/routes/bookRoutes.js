@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/Book');
+const mongoose = require('mongoose');
+
+// Function to check if an ID is valid
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // Add a new book
 router.post('/', async (req, res) => {
@@ -28,6 +32,11 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: 'Invalid ID format' });
+    }
+
     const deletedBook = await Book.findByIdAndDelete(id);
 
     if (!deletedBook) {
@@ -40,10 +49,15 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// ✅ Update a book by ID
+// Update a book by ID
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: 'Invalid ID format' });
+    }
+
     const updatedBook = await Book.findByIdAndUpdate(
       id,
       req.body,
