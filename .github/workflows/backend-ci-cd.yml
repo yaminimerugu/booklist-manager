@@ -63,9 +63,9 @@ jobs:
       - name: 🚀 Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}   # Check if this is correctly referencing the EC2 Host secret
+          host: ${{ secrets.EC2_HOST }}   
           username: ec2-user
-          key: ${{ secrets.EC2_KEY }}     # Ensure EC2_KEY is correctly set
+          key: ${{ secrets.EC2_KEY }}     
           script: |
             echo "📂 Navigating to the app directory..."
             cd /home/ec2-user/booklist-manager/backend || { echo "❌ Directory not found"; exit 1; }
