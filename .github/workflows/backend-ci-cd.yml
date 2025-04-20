@@ -100,11 +100,11 @@ jobs:
 
       - name: 🧾 Generate and analyze logs
         run: |
-          echo "📝 Generating logs..."
+          echo "Generating logs..."
           echo "$(date) - Deployment successful" >> app.log
           tail -n 10 app.log
 
       - name: ☁️ Push logs to remote service (optional)
         run: |
           echo "📤 Pushing logs..."
-          curl -X POST -H "Content-Type: text/plain" --data-binary @app.log https://log-management-service.com/api/logs || echo "⚠️ Log push failed (optional)"
+          curl -X POST -H "Content-Type: text/plain" --data-binary @app.log https://log-management-service.com/api/logs || echo "Log push failed (optional)"
